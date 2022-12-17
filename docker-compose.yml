@@ -1,0 +1,39 @@
+version: "3.2"
+services:
+
+  database:
+    container_name: postgres
+    image: "postgres:12"
+    networks:
+      - postgres 
+    ports:
+      - "5432:5432"
+    volumes:
+      - volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: darts
+      POSTGRES_PASSWORD: darts
+      POSTGRES_DB: darts
+    restart: unless-stopped
+
+  backend:
+    container_name: backend
+    build: .
+    restart: "unless-stopped"
+    ports:
+      - "3000:3000"
+    networks:
+      - postgres
+    links:
+      - database
+    depends_on:
+      - database
+
+volumes:
+  volume:
+    driver: local
+
+networks:
+  postgres: 
+    driver: bridge
+
